@@ -1,6 +1,8 @@
 package com.sbs.untact.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.untact.dto.Article;
+import com.sbs.untact.util.Util;
 
 @Controller
 public class UsrArticleController {
@@ -45,7 +48,14 @@ public class UsrArticleController {
 	
 	@RequestMapping("/usr/article/doAdd")
 	@ResponseBody
-	public Map<String, Object> doAdd(String regDate, String title, String body) {
+	public Map<String, Object> doAdd(String title, String body) {
+		
+		// SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		// Date time = new Date();
+		// String regDate = format1.format(time);
+		
+		String regDate = Util.getNowDateStr();
+		
 		articles.add(new Article(++articlesLastId, regDate, title, body));
 		
 		Map<String, Object> rs = new HashMap<>();
@@ -54,7 +64,7 @@ public class UsrArticleController {
 		rs.put("id", articlesLastId);
 		return rs;
 	}
-	
+
 	@RequestMapping("/usr/article/doDelete")
 	@ResponseBody
 	public Map<String, Object> doDelete(int id) {
