@@ -5,86 +5,59 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.untact.dto.Article;
 import com.sbs.untact.dto.ResultData;
+import com.sbs.untact.service.ArticleService;
 import com.sbs.untact.util.Util;
 
 @Controller
 public class UsrArticleController {
 
-	private int articlesLastId;
-	
-	private List<Article> articles;
-	
-	public UsrArticleController() {
-		// 멤버변수 초기화
-		articlesLastId=0;
-		
-		// 게시물 2개 생성
-		articles= new ArrayList<>();
-		articles.add(new Article(++articlesLastId, "2020-12-12 12:12:12", "2020-12-12 12:12:12", "제목1", "내용1"));
-		articles.add(new Article(++articlesLastId, "2020-12-12 12:12:12", "2020-12-12 12:12:12", "제목2", "내용2"));
-	
-	}
-	
+	@Autowired
+	private ArticleService articleService;
 	
 	@RequestMapping("/usr/article/detail")
 	@ResponseBody
 	public Article showDetail(int id) {
-		
-		return articles.get(id-1);
+		Article article = articleService.getArticle(id);
+		return article;
 	}
 	
 	@RequestMapping("/usr/article/list")
 	@ResponseBody
 	public List<Article> showList() {
-		return articles;
+		return articleService.getArticles();
 	}
 	
 	@RequestMapping("/usr/article/doAdd")
 	@ResponseBody
 	public ResultData doAdd(String title, String body) {
+		if(title != null) {
+			return new ResultData("F-1","title을 입력해주세요.");
+		}
 		
-		// SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		// Date time = new Date();
-		// String regDate = format1.format(time);
+		if(body != null) {
+			return new ResultData("F-1","body를 입력해주세요.");
+		}
 		
-		String regDate = Util.getNowDateStr();
-		String updateDate = regDate;
-		
-		articles.add(new Article(++articlesLastId, regDate, updateDate, title, body));
-		
-		return new ResultData("S-1","성공하였습니다.", "id", articlesLastId);
+		return articleService.add(title, body);
 	}
 
 	@RequestMapping("/usr/article/doDelete")
 	@ResponseBody
 	public ResultData doDelete(int id) {
-		boolean deleteArticleRs= deleteArticle(id);
+		Article article = articleService.getArticle(id);
 		
-		if(deleteArticleRs == false) {
-			return new ResultData( "F-1", "해당 게시물은 존재하지 않습니다.");
-
-		} 
-		
-		return new ResultData( "S-1", "성공하였습니다.", "id", id);
-					
-	}
-
-
-	private boolean deleteArticle(int id) {
-		for(Article article : articles) {
-			if(article.getId()==id) {
-				articles.remove(article);
-				return true;
-			}
-			
+		if(article == null) {
+			return new ResultData("F-1","해당 게시물은 존재하지 않습니다.");
 		}
-		return false;
+		
+		return articleService.deleteArticle(id);			
 	}
 	
 	@RequestMapping("/usr/article/doModify")
