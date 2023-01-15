@@ -1,8 +1,6 @@
 package com.sbs.untact.controller;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +57,7 @@ public class UsrArticleController {
 		
 		articles.add(new Article(++articlesLastId, regDate, updateDate, title, body));
 		
-		Map<String, Object> rs = new HashMap<>();
-		rs.put("resultCode", "S-1");
-		rs.put("msg", "성공하였습니다.");
-		rs.put("id", articlesLastId);
-		return rs;
+		return Util.mapOf("resultCode", "S-1","msg", "성공하였습니다.","id", articlesLastId);
 	}
 
 	@RequestMapping("/usr/article/doDelete")
@@ -71,19 +65,13 @@ public class UsrArticleController {
 	public Map<String, Object> doDelete(int id) {
 		boolean deleteArticleRs= deleteArticle(id);
 		
-		Map<String, Object> rs = new HashMap<>();
+		if(deleteArticleRs == false) {
+			return Util.mapOf("resultCode", "F-1","msg", "해당 게시물은 존재하지 않습니다.");
+
+		} 
 		
-		if(deleteArticleRs) {
-			
-			rs.put("resultCode", "S-1");
-			rs.put("msg", "성공하였습니다.");
-			
-		} else {
-			rs.put("resultCode", "F-1");
-			rs.put("msg", "해당 게시물은 존재하지 않습니다.");
-		}
-		
-		return rs;
+		return Util.mapOf("resultCode", "S-1","msg", "성공하였습니다.", "id", id);
+					
 	}
 
 
@@ -109,24 +97,19 @@ public class UsrArticleController {
 				break;
 			}
 		}
+		
 		Map<String, Object> rs = new HashMap<>();
 		
 		
 		if(selArticle == null) {
-			
-			rs.put("resultCode", "F-1");
-			rs.put("msg", String.format("%d번 게시물은 존재하지 않습니다.", id));
-			return rs;
+			return Util.mapOf("resultCode", "F-1","msg", String.format("%d번 게시물은 존재하지 않습니다.", id));
 		} 
 		
 		selArticle.setUpdateDate(Util.getNowDateStr());
 		selArticle.setTitle(title);
 		selArticle.setBody(body);
 		
-		rs.put("resultCode", "S-1");
-		rs.put("msg", String.format("%d번 게시물이 수정되었습니다.", id));
-		rs.put("id", "id");
-		return rs;
+		return Util.mapOf("resultCode", "S-1","msg", String.format("%d번 게시물이 수정되었습니다.", id),"id", id);
 		
 	}
 		
